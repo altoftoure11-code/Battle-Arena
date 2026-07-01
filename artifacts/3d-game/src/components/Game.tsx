@@ -108,6 +108,10 @@ export default function Game({
   const [vehicleState,   setVehicleState]   = useState<VehicleState|null>(null);
   const [inVehicle,      setInVehicle]      = useState(false);
   const [vehicleHealth,  setVehicleHealth]  = useState(0);
+  const [medKits,        setMedKits]        = useState(3);
+  const [skillCooldown,  setSkillCooldown]  = useState(0);
+
+  const SKILL_MAX_CD = character.skillType === 'active' ? 30 : 0;
 
   const bulletId       = useRef(0);
   const enemyBulletId  = useRef(1_000_000);
@@ -147,6 +151,13 @@ export default function Game({
     return ()=>clearInterval(iv);
   }, [character.healRegen,gameState,maxHp]);
 
+  // Skill cooldown countdown
+  useEffect(() => {
+    if (skillCooldown <= 0) return;
+    const iv = setInterval(()=>setSkillCooldown((c)=>Math.max(0, c-1)), 1000);
+    return ()=>clearInterval(iv);
+  }, [skillCooldown]);
+
   // Airplane phase ticker (BR only)
   useEffect(() => {
     if (flightPhase!=="airplane") return;
@@ -183,10 +194,24 @@ export default function Game({
       if (e.key === "g" || e.key === "G") handleCreateGloo();
       if (e.key === "v" || e.key === "V") handleSpawnVehicle();
       if (e.key === "f" || e.key === "F") handleToggleVehicle();
+      if (e.key === "h" || e.key === "H") handleUseMedKit();
+      if (e.key === "q" || e.key === "Q") handleUseSkill();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [glooWalls, vehicleState, inVehicle, activeVehicleId]);
+
+  const handleUseMedKit = useCallback(() => {
+    if (medKits <= 0 || hp >= maxHp) return;
+    setMedKits((m) => m - 1);
+    setHp((h) => Math.min(maxHp, h + 50));
+  }, [medKits, hp, maxHp]);
+
+  const handleUseSkill = useCallback(() => {
+    if (character.skillType !== 'active' || skillCooldown > 0) return;
+    setSkillCooldown(30);
+    setHp((h) => Math.min(maxHp, h + 30));
+  }, [character.skillType, skillCooldown, maxHp]);
 
   const triggerFlash = useCallback(() => {
     setShowFlash(true);
@@ -211,6 +236,7 @@ export default function Game({
     setBloodEntries([]); setDmgNumbers([]);
     setVehicleState(null); setInVehicle(false);
     setVehicleHealth(0);
+    setMedKits(3); setSkillCooldown(0);
     playerPosRef.current.set(0, 0.75, 0);
 
     if (gameMode === "battle-royale") {
@@ -566,6 +592,9 @@ export default function Game({
             isTouch={isTouch} loadout={loadout} activeSlot={activeSlot}
             onSwitchSlot={setActiveSlot} gameMode={gameMode}
             isZoomed={isZoomed} onCreateGloo={handleCreateGloo} onToggleZoom={handleToggleZoom}
+            medKits={medKits} onUseMedKit={handleUseMedKit}
+            skillCooldown={skillCooldown} skillMaxCd={SKILL_MAX_CD} onUseSkill={handleUseSkill}
+            character={character} activeWeapon={activeWeapon}
           />
           <MobileControls inputRef={inputRef} />
         </>

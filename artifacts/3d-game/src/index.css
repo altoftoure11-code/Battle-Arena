@@ -1137,3 +1137,222 @@
   transition: all 0.2s;
 }
 .login-submit:hover { transform: scale(1.02); box-shadow: 0 6px 24px rgba(255,160,0,0.4); }
+
+/* ═══════════════════════════════════════════
+   WEAPON VISUAL PANEL (bottom center HUD)
+═══════════════════════════════════════════ */
+.weapon-visual {
+  position: fixed;
+  bottom: 90px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  background: linear-gradient(160deg, rgba(10,14,28,0.92) 0%, rgba(5,8,18,0.88) 100%);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 14px;
+  padding: 10px 18px 8px;
+  min-width: 190px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06);
+  pointer-events: none;
+  z-index: 30;
+}
+.wv-category {
+  font-size: 0.55rem;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+.wv-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.wv-icon {
+  font-size: 2rem;
+  filter: drop-shadow(0 0 8px rgba(255,255,255,0.3));
+}
+.wv-details { display: flex; flex-direction: column; gap: 2px; }
+.wv-name {
+  font-size: 0.92rem;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.wv-ammo {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.55);
+}
+.wv-ammo-cur { font-size: 0.78rem; font-weight: 800; }
+.wv-stat-row {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+.wv-stat { display: flex; flex-direction: column; gap: 3px; flex: 1; }
+.wv-stat-label {
+  font-size: 0.5rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.4);
+  text-transform: uppercase;
+}
+.wv-stat-bar {
+  height: 3px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.wv-stat-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.3s ease;
+  box-shadow: 0 0 4px currentColor;
+}
+
+/* ═══════════════════════════════════════════
+   BOTTOM-LEFT HUD CONTAINER (bars + quick actions)
+═══════════════════════════════════════════ */
+.hud-bottom-left {
+  position: fixed;
+  bottom: 14px;
+  left: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 30;
+}
+
+/* ═══════════════════════════════════════════
+   QUICK ACTION BUTTONS (Med Kit / Skill / Gloo)
+═══════════════════════════════════════════ */
+.hud-quick-actions {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+}
+.hud-quick-btn {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(10,14,28,0.88);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  cursor: pointer;
+  transition: transform 0.12s, box-shadow 0.12s, border-color 0.15s;
+  overflow: hidden;
+  backdrop-filter: blur(8px);
+  -webkit-tap-highlight-color: transparent;
+  touch-action: none;
+}
+.hud-quick-btn:hover:not(:disabled) {
+  transform: scale(1.07);
+}
+.hud-quick-btn:active:not(:disabled) {
+  transform: scale(0.94);
+}
+.hqb-icon { font-size: 1.5rem; line-height: 1; }
+.hqb-label {
+  font-size: 0.44rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.65);
+  text-transform: uppercase;
+}
+.hqb-count {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  font-size: 0.65rem;
+  font-weight: 900;
+  color: #fff;
+  background: rgba(0,0,0,0.55);
+  border-radius: 999px;
+  padding: 0 4px;
+  line-height: 1.4;
+}
+.hqb-passive-tag {
+  font-size: 0.38rem;
+  font-weight: 900;
+  color: rgba(255,220,0,0.6);
+  letter-spacing: 0.08em;
+}
+
+/* Med Kit specific */
+.hud-quick-btn--medkit {
+  border-color: rgba(80,255,120,0.35);
+  box-shadow: 0 0 12px rgba(80,255,120,0.15);
+}
+.hud-quick-btn--medkit:hover:not(:disabled) {
+  border-color: rgba(80,255,120,0.7);
+  box-shadow: 0 0 20px rgba(80,255,120,0.35);
+}
+
+/* Skill specific */
+.hud-quick-btn--skill {
+  border-color: rgba(255,210,0,0.35);
+  box-shadow: 0 0 12px rgba(255,210,0,0.15);
+  width: 66px;
+  height: 66px;
+  border-radius: 50%;
+}
+.hud-quick-btn--skill:hover:not(:disabled) {
+  border-color: rgba(255,210,0,0.7);
+  box-shadow: 0 0 22px rgba(255,210,0,0.4);
+}
+.hud-quick-btn--cooldown {
+  opacity: 0.75;
+}
+.hqb-cd-ring {
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  transition: background 0.5s linear;
+  mask: radial-gradient(transparent 55%, black 56%);
+  -webkit-mask: radial-gradient(transparent 55%, black 56%);
+}
+.hqb-cd-text {
+  position: absolute;
+  top: 6px;
+  right: 5px;
+  font-size: 0.58rem;
+  font-weight: 900;
+  color: rgba(255,210,0,0.9);
+}
+
+/* Grenade/Gloo */
+.hud-quick-btn--grenade {
+  border-color: rgba(100,180,255,0.3);
+  box-shadow: 0 0 10px rgba(100,180,255,0.12);
+}
+.hud-quick-btn--grenade:hover {
+  border-color: rgba(100,180,255,0.65);
+  box-shadow: 0 0 18px rgba(100,180,255,0.3);
+}
+
+/* Disabled state */
+.hud-quick-btn--disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* Extra action buttons (crouch / sprint) */
+.hud-action-btn--crouch {
+  border-color: rgba(200,180,255,0.4) !important;
+  box-shadow: 0 0 10px rgba(180,140,255,0.15) !important;
+}
+.hud-action-btn--sprint {
+  border-color: rgba(255,150,50,0.4) !important;
+  box-shadow: 0 0 10px rgba(255,130,30,0.15) !important;
+}

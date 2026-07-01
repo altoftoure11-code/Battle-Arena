@@ -22,3 +22,19 @@ export interface EnemyBulletData {
 }
 
 export type GameState = "start" | "playing" | "gameover" | "win";
+
+export type FlightPhase = "airplane" | "freefall" | "parachute" | "landed" | null;
+
+export interface VehicleState {
+  vehicleId: string;
+  position: [number, number, number];
+  rotation: number;
+  health: number;
+  speed: number;
+  isOccupied: boolean;
+}
+
+export interface BloodEntry {
+  id: number;
+  position: [number, number, number];
+}

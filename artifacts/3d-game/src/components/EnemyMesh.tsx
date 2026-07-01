@@ -2,32 +2,32 @@ import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import type { EnemyData } from "@/types/game";
+import { resolveObstacleCollision } from "@/lib/obstacles";
 
 const ARENA_HALF = 36;
 
 interface EnemyMeshProps {
-  enemy: EnemyData;
-  onUpdate: (
-    id: number,
-    pos: [number, number, number],
-    vel: [number, number],
-    timer: number
-  ) => void;
+  enemy:    EnemyData;
+  onUpdate: (id:number, pos:[number,number,number], vel:[number,number], timer:number) => void;
 }
 
 export function EnemyMesh({ enemy, onUpdate }: EnemyMeshProps) {
-  const groupRef = useRef<THREE.Group>(null!);
-  const walkPhaseRef = useRef(Math.random() * Math.PI * 2);
+  const groupRef    = useRef<THREE.Group>(null!);
+  const walkPhase   = useRef(Math.random() * Math.PI * 2);
+  const lArmRef     = useRef<THREE.Mesh>(null!);
+  const rArmRef     = useRef<THREE.Mesh>(null!);
+  const lLegRef     = useRef<THREE.Mesh>(null!);
+  const rLegRef     = useRef<THREE.Mesh>(null!);
 
-  const posRef = useRef<[number, number, number]>([...enemy.position]);
-  const velRef = useRef<[number, number]>([...enemy.velocity]);
-  const timerRef = useRef(enemy.changeTimer);
-  const syncTimerRef = useRef(0);
+  const posRef      = useRef<[number,number,number]>([...enemy.position]);
+  const velRef      = useRef<[number,number]>([...enemy.velocity]);
+  const timerRef    = useRef(enemy.changeTimer);
+  const syncTimer   = useRef(0);
 
   useFrame((_, delta) => {
     if (!groupRef.current) return;
     const dt = Math.min(delta, 0.05);
-    walkPhaseRef.current += dt * 9;
+    walkPhase.current += dt * 9;
 
     timerRef.current -= dt;
     if (timerRef.current <= 0) {
@@ -37,83 +37,91 @@ export function EnemyMesh({ enemy, onUpdate }: EnemyMeshProps) {
       timerRef.current = 1.5 + Math.random() * 2.5;
     }
 
-    let nx = posRef.current[0] + velRef.current[0] * dt;
-    let nz = posRef.current[2] + velRef.current[1] * dt;
+    const nx = posRef.current[0] + velRef.current[0] * dt;
+    const nz = posRef.current[2] + velRef.current[1] * dt;
 
-    if (nx > ARENA_HALF || nx < -ARENA_HALF) {
-      velRef.current[0] *= -1;
-      nx = Math.max(-ARENA_HALF, Math.min(ARENA_HALF, nx));
-    }
-    if (nz > ARENA_HALF || nz < -ARENA_HALF) {
-      velRef.current[1] *= -1;
-      nz = Math.max(-ARENA_HALF, Math.min(ARENA_HALF, nz));
-    }
+    const resolved = resolveObstacleCollision({ x: nx, z: nz, y: 0.75 }, { x: posRef.current[0], z: posRef.current[2] });
+    let rx = resolved.x;
+    let rz = resolved.z;
 
-    posRef.current = [nx, 0.75, nz];
-    groupRef.current.position.set(nx, 0.75, nz);
+    if (rx > ARENA_HALF || rx < -ARENA_HALF) { velRef.current[0] *= -1; rx = Math.max(-ARENA_HALF, Math.min(ARENA_HALF, rx)); }
+    if (rz > ARENA_HALF || rz < -ARENA_HALF) { velRef.current[1] *= -1; rz = Math.max(-ARENA_HALF, Math.min(ARENA_HALF, rz)); }
 
-    const angle = Math.atan2(velRef.current[0], velRef.current[1]);
-    groupRef.current.rotation.y = angle;
+    posRef.current = [rx, 0.75, rz];
+    groupRef.current.position.set(rx, 0.75, rz);
+    groupRef.current.rotation.y = Math.atan2(velRef.current[0], velRef.current[1]);
 
-    syncTimerRef.current += dt;
-    if (syncTimerRef.current > 0.1) {
-      syncTimerRef.current = 0;
+    const swing = Math.sin(walkPhase.current) * 0.5;
+    if (lArmRef.current) lArmRef.current.rotation.x = swing;
+    if (rArmRef.current) rArmRef.current.rotation.x = -swing;
+    if (lLegRef.current) lLegRef.current.rotation.x = -swing;
+    if (rLegRef.current) rLegRef.current.rotation.x = swing;
+
+    syncTimer.current += dt;
+    if (syncTimer.current > 0.1) {
+      syncTimer.current = 0;
       onUpdate(enemy.id, posRef.current, velRef.current, timerRef.current);
     }
   });
 
+  const c = enemy.color;
+  const darkC = new THREE.Color(c).multiplyScalar(0.55).getStyle();
+
   return (
     <group ref={groupRef} position={enemy.position}>
-      {/* Enemy body */}
-      <mesh position={[0, 0, 0]} castShadow>
-        <boxGeometry args={[0.55, 0.7, 0.3]} />
-        <meshLambertMaterial color={enemy.color} />
-      </mesh>
-
-      {/* Enemy head */}
-      <mesh position={[0, 0.6, 0]} castShadow>
-        <boxGeometry args={[0.42, 0.42, 0.42]} />
-        <meshLambertMaterial color={enemy.color} emissive={enemy.color} emissiveIntensity={0.12} />
-      </mesh>
-
-      {/* Enemy helmet */}
+      {/* Helmet */}
       <mesh position={[0, 0.83, 0]} castShadow>
         <boxGeometry args={[0.46, 0.22, 0.46]} />
-        <meshLambertMaterial color="#111111" />
+        <meshStandardMaterial color="#111111" metalness={0.6} roughness={0.3} />
+      </mesh>
+
+      {/* Head */}
+      <mesh position={[0, 0.6, 0]} castShadow>
+        <boxGeometry args={[0.42, 0.42, 0.42]} />
+        <meshStandardMaterial color={c} roughness={0.6}
+          emissive={c} emissiveIntensity={0.2} />
       </mesh>
 
       {/* Glowing eyes */}
       <mesh position={[-0.11, 0.63, -0.22]}>
-        <boxGeometry args={[0.08, 0.08, 0.02]} />
+        <boxGeometry args={[0.09, 0.09, 0.02]} />
         <meshBasicMaterial color="#ffffff" />
       </mesh>
       <mesh position={[0.11, 0.63, -0.22]}>
-        <boxGeometry args={[0.08, 0.08, 0.02]} />
+        <boxGeometry args={[0.09, 0.09, 0.02]} />
         <meshBasicMaterial color="#ffffff" />
+      </mesh>
+      <pointLight color={c} intensity={0.5} distance={2} position={[0, 0.6, -0.3]} />
+
+      {/* Body */}
+      <mesh position={[0, 0, 0]} castShadow>
+        <boxGeometry args={[0.55, 0.7, 0.3]} />
+        <meshStandardMaterial color={c} roughness={0.65}
+          emissive={c} emissiveIntensity={0.12} />
       </mesh>
 
       {/* Left arm */}
-      <mesh position={[-0.38, -0.02, 0]} castShadow>
-        <boxGeometry args={[0.18, 0.55, 0.18]} />
-        <meshLambertMaterial color={enemy.color} />
+      <mesh ref={lArmRef} position={[-0.38, -0.02, 0]} castShadow>
+        <boxGeometry args={[0.19, 0.56, 0.19]} />
+        <meshStandardMaterial color={darkC} roughness={0.7} />
       </mesh>
 
       {/* Right arm */}
-      <mesh position={[0.38, -0.02, 0]} castShadow>
-        <boxGeometry args={[0.18, 0.55, 0.18]} />
-        <meshLambertMaterial color={enemy.color} />
+      <mesh ref={rArmRef} position={[0.38, -0.02, 0]} castShadow>
+        <boxGeometry args={[0.19, 0.56, 0.19]} />
+        <meshStandardMaterial color={darkC} roughness={0.7} />
       </mesh>
 
       {/* Left leg */}
-      <mesh position={[-0.16, -0.55, 0]} castShadow>
-        <boxGeometry args={[0.2, 0.5, 0.2]} />
-        <meshLambertMaterial color={enemy.color} />
+      <mesh ref={lLegRef} position={[-0.16, -0.55, 0]} castShadow>
+        <boxGeometry args={[0.21, 0.5, 0.21]} />
+        <meshStandardMaterial color={darkC} roughness={0.8} />
       </mesh>
 
       {/* Right leg */}
-      <mesh position={[0.16, -0.55, 0]} castShadow>
-        <boxGeometry args={[0.2, 0.5, 0.2]} />
-        <meshLambertMaterial color={enemy.color} />
+      <mesh ref={rLegRef} position={[0.16, -0.55, 0]} castShadow>
+        <boxGeometry args={[0.21, 0.5, 0.21]} />
+        <meshStandardMaterial color={darkC} roughness={0.8} />
       </mesh>
 
       {/* Shadow */}

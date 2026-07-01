@@ -1,0 +1,29 @@
+========================================
+MODULE 1 : HUD DE COMBAT & INTERFACE (MINIMUM 11 BOUTONS TACTILES INTERACTIFS)
+=========================================
+1. L'INTERFACE HUD CROSS-PLATFORM (Tactile réactif sur Mobile iOS/Android avec mapping automatique Clavier/Souris sur PC) : Développe l'interface contenant exactement ces boutons :
+   [1] Joystick virtuel de déplacement, [2] Grand bouton de Tir principal, [3] Bouton Visée (Scope), [4] Bouton Compétence Active, [5] Raccourci Kit Médical rapide, [6] Bouton Saut, [7] Bouton S'accroupir, [8] Bouton Sprint, [9] Bouton Pause/Sortie (ferme le socket et retourne instantanément au Lobby), [10] Curseur de Sensibilité en direct (modifie le multiplicateur de rotation de la caméra), et le tout nouveau [11] Bouton Émotes (ouvre une roue de sélection d'émotes en jeu).
+2. LOGIQUE DU VISEUR (SCOPE FLUIDE) : Transition de la caméra via une interpolation linéaire (Lerp). Au clic sur le bouton Viseur (ou Clic Droit sur PC), la caméra glisse de façon fluide au-dessus de l'épaule droite du personnage humain 3D, active un réticule de précision central et divise par deux la sensibilité pour ajuster les tirs.
+
+=========================================
+MODULE 2 : GRANDE BOUTIQUE 3D GÉANTE & VESTIAIRE (190+ ARTICLES DONT 30+ ÉMOTES)
+=========================================
+1. CATALOGUE DE LA BOUTIQUE (STRUCTURE JSON SÉCURISÉE CÔTÉ SERVEUR) : Un inventaire massif d'objets modélisés en 3D que le joueur peut inspecter sous tous les angles :
+   - 60 ARMES (Fusils d'assaut, Snipers, Pistolets, Katanas) attachables dynamiquement à l'os de la main droite (RightHandBone).
+   - 50 HABITS (Vestes tactiques, Sweats streetwear, Armures).
+   - 30 PANTALONS (Jeans de combat, Shorts de sport).
+   - 20 CHAUSSURES (Baskets montantes, Bottes de combat).
+   - PLUS DE 30 ÉMOTES DE DANSE ET GESTES DRÔLES (Funny Gestures, Breakdance, Provocations, Salutations, Célébrations légendaires).
+2. LOGIQUE D'ACHAT ET VESTIAIRE : Aucune transaction d'argent réel. L'or et les diamants se gagnent uniquement via la progression. Le serveur valide chaque achat (`buyItem`) en vérifiant le niveau et le solde du joueur. Le Vestiaire 3D applique instantanément les habits sur le maillage (Mesh) et permet de prévisualiser les animations de danse des émotes achetées.
+
+=========================================
+MODULE 3 : SYSTÈME DE PROGRESSION (NIVEAU 1 À 100) & RÉSEAU MULTIJOUEUR
+=========================================
+1. DIFFICULTÉ EXPONENTIELLE DES NIVEAUX : Algorithme mathématique d'XP côté serveur où la difficulté augmente à chaque palier du niveau 1 au niveau 100 (ex: Niveau 1 = 100 XP, Niveau 100 = 100 000 XP).
+2. RÉCOMPENSES ET RÉSEAU : À la fin de chaque match (calculé sur le temps de survie et les éliminations), le serveur injecte l'XP, l'Or et les Diamants. Chaque passage de niveau débloque l'accès à de nouveaux paliers de la boutique 3D. Le netcode gère la reconnexion automatique instantanée en cas de micro-coupure réseau mobile ou changement d'antenne 4G/5G.
+3. SYNCHRONISATION DES ÉMOTES EN LIGNE : Lorsqu'un joueur active une émote (danse/geste drôle) depuis sa roue d'émotes (en Lobby ou en Match), le serveur Socket.io diffuse l'événement à tous les clients connectés pour appliquer l'animation squelettique correspondante sur son modèle humain 3D. Si le joueur bouge ou subit des dégâts, l'émote s'interrompt immédiatement.
+
+Génère l'arborescence des fichiers monolithique idéale pour Replit. Écris ensuite le code JavaScript et Node.js complet et ultra-précis pour :
+1. Le fichier serveur `server-game.js` (Initialisation Socket.io, Login, Matchmaking, système d'XP 1-100, gestion réseau des tirs par Raycasting, et la fonction d'achat sécurisée pour les 190+ items de la boutique dont la structure des 30+ émotes).
+2. Le fichier client `hud-controls.js` (Création HTML/CSS/JS des 11 boutons requis, curseur de sensibilité, bouton pause/sortie, roue des émotes interactive et gestion du Lerp de la caméra du Viseur).
+3. Le module de rendu client `player-animations.js` (Scène Three.js du Lobby/Match, rotation automatique, attachement des armes et système d'animation squelettique gérant le passage fluide entre l'état d'attente (Idle), de course, de tir, et le déclenchement des émotes de danse / gestes drôles).

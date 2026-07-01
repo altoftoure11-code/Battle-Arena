@@ -1,0 +1,45 @@
+=========================================
+MODULE 1 : MULTIJOUEUR, RÉSEAU & LOBBY
+=========================================
+1. CONFIGURATION RÉSEAU SOCKET.IO : Serveur Node.js avec gestion des micro-coupures (heartbeat/ping) pour reconnecter automatiquement un joueur en direct sans perte de session.
+2. SYSTÈME DE GUILDE ET CLANS : Structure de données pour Clan (Nom, Tag, Grades), chat de guilde dédié et API de boutique de guilde.
+3. INVITATION EN DIRECT : Système de matchmaking/groupe en lobby qui matérialise l'avatar 3D de l'ami invité à côté du joueur.
+4. INSPECTION & LEADERBOARD : Fiche statistique (Ratio K/D, Niveau 1-1000, Victoires) au clic sur un joueur et classement Top 100 mondial synchronisé en temps réel.
+5. ÉCONOMIE : Recyclage de skins doublons contre jetons et système qui offre 10 Diamants toutes les 5 parties complétées.
+6. ENTRÉE LÉGENDAIRE : Logique d'activation d'effets visuels 3D à l'arrivée d'un joueur VIP dans le lobby.
+
+=========================================
+MODULE 2 : PHASE DE DROP, LOOT & GLOO WALLS
+=========================================
+1. SYSTÈME D'AVION & DROPPING : Logique de vol rectiligne de l'avion, bouton 'SAUTER', calcul de la trajectoire de chute libre et déploiement du parachute.
+2. RÈGLE DE NON-AGRESSION : Minuteur de sécurité (45s) au départ. Interdiction stricte de tirer ou de faire des dégâts. Obligation de chercher des armes en premier.
+3. INVENTAIRE & LOOT 3D : Spawners d'objets au sol (Armes, Épées, Sacs à dos Niv. 1-3 pour étendre l'inventaire, Argent, Diamants). Système de ramassage (touche 'F' ou bouton mobile).
+4. MÉCANIQUE DES GLOO WALLS : Déploiement instantané d'un mur de glace 3D destructible devant le joueur avec ses propres points de vie (HP).
+
+=========================================
+MODULE 3 : GARAGE & VÉHICULES
+=========================================
+1. GARAGE : Menu d'achat de véhicules (Voitures de sport, Motos, Monster Trucks) avec la monnaie du jeu.
+2. CONDUITE CROSS-PLATFORM : Script de physique automobile gérant les commandes ZQSD (PC) et Joystick/Pédales virtuelles (Mobile). Gestion des collisions et des dégâts par écrasement sur les ennemis.
+
+=========================================
+MODULE 4 : MODES DE JEU, ROSTER ANIME & SÉCURITÉ COLLISION
+=========================================
+1. GESTIONNAIRE DE MODES (10+ MODES) : Système de matchmaking gérant :
+   - LOUP SOLITAIRE (Lone Wolf) : Combat 1v1 / 2v2 sur map fermée au meilleur des 5 manches.
+   - MODE ENTRAÎNEMENT : Zone libre, munitions illimitées et mannequins de test de dégâts.
+   - Stubs pour : Battle Royale, TDM, Capture de Drapeau, Course aux Diamants, Zombie, Gun Game, Élimination Confirmée, Roi de la Colline.
+2. ANTI-CLIP COLLISIONS ABSOLU (GLOO WALLS) : Double validation stricte (Client + Serveur par Raycasting). Interdiction absolue pour les joueurs et les tirs de traverser les décors ou les Gloo Walls tant qu'ils ne sont pas détruits.
+3. ROSTER ANIME 3D : Structure pour charger des modèles humains (Goku, Naruto, Senku, Eren, Rimuru) avec leurs états d'animation.
+4. SKINS ÉVOLUTIFS : Remplacement complet du Mesh 3D avec auras de particules (Feu/Électricité) indexées sur le niveau de l'arme.
+5. SYSTÈME DE SANG (GORE) : Particules de sang 3D à l'impact et flash rouge directionnel sur l'écran de la victime.
+
+=========================================
+MODULE 5 : GRAPHISMES, AUDIO & HUD COMPLET
+=========================================
+1. HUD DRAG & DROP : Système d'édition permettant de glisser, redimensionner et changer l'opacité de tous les boutons tactiles. Sauvegarde locale (LocalStorage) et mapping automatique vers Clavier/Souris sur PC.
+2. SPECTATEUR : Interpolation de caméra automatique sur le tueur ou l'allié après la mort.
+3. OPTIMISATION (FPS BOOSTER) : Switch graphique global : 'SMOOTH' (Pas d'ombres, textures légères, lock 30 FPS) vs 'ULTRA' (Ombres douces, reflets, 60+ FPS).
+4. CYCLES & AUDIO SPATIALISÉ : Météo dynamique (Pluie avec reflets, pétales 3D), cycle Jour/Nuit progressif. Atténuation des bruits de pas (-80%) accroupi et sons selon le sol (herbe, bois).
+5. INDICATEUR DE TIRS : Arc de cercle rouge directionnel autour du réticule indiquant la provenance des dégâts.
+6. BOUTON ŒIL : Interpolation linéaire (Lerp) de la caméra libre à 360° pour éviter les saccades.

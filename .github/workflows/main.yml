@@ -1,0 +1,15 @@
+name: Build Offline APK
+on: [push, workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v3
+
+      - name: Build Android APK (No Size Limit)
+        uses: jonasmerlin/web-to-apk-action@v1
+        with:
+          title: "Battle Arena Nexus"
+          icon: "battle_arena_nexus_512x512.png" # Assure-toi d'avoir bien téléversé ton logo avec ce nom exact sur GitHub
